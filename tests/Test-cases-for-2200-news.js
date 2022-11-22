@@ -1,8 +1,8 @@
-
 //const { axe } = require('@axe-core/playwright').default;
 const AxeBuilder = require('@axe-core/playwright').default;
-const { chromium } = require('playwright')
-const { expect } = require('@playwright/test')
+const { chromium } = require('playwright');
+const { expect } = require('@playwright/test');
+const { createHtmlReport } = require('axe-html-reporter');
 
 const parallelTests = async (capability) => {
   console.log('Initialising test:: ', capability['LT:Options']['name'])
@@ -25,6 +25,11 @@ const parallelTests = async (capability) => {
       //console.log(" Passes: " +results.passes.length);
       //expect(results.violations.length).toEqual([]);
       testError = results.violations.length + results.inapplicable.length;
+    (() => {
+      // creates html report with the name `accessibilityReport.html` file
+      createHtmlReport({ results });
+    })();
+
     } catch (e) {
     console.error('Something bad happened:', e.message);
   }
@@ -33,6 +38,9 @@ const parallelTests = async (capability) => {
 
   await expect(page.locator('span:has-text("22.00 Kymmenen uutiset")')).toBeTruthy();
   console.log("Testing errors: "+ testError);
+
+
+
   await browser.close()
 }
 
